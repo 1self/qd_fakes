@@ -1,0 +1,19 @@
+{
+    "_id": "54360dcffac9bc9a10be23af",
+    "event": {
+        "createdOn": "2014-10-08T21:23:43-07:00",
+        "id": "0d955430-4f6c-11e4-862b-454385106143"
+    },
+    "payload": {
+        "actionTags": [
+            "push"
+        ],
+        "source": "Bitbucket_app",
+        "objectTags": [
+            "source control"
+        ],
+        "streamid": "TQAMFULSJWVRDZKG",
+        "properties": {},
+        "eventDateTime": "2014-10-08T21:23:43-07:00"
+    }
+}
