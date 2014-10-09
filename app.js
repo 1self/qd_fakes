@@ -98,6 +98,13 @@ app.post('/stream/:id/event', function (req, res) {
     );
  });
 
+app.get('/reset', function (req, res) {
+   fs.remove(__dirname +'/fake_data', function(err){
+     if (err) return console.error(err);
+     res.send('Fakes reset complete!!');
+   });
+ });
+
 
 var parseEvent = function(event, stream, res){
     var event = {
