@@ -23,42 +23,27 @@ app.use(express.static(__dirname + '/public'));
 exports.app = app;
 
 app.post('/stream', function (req, res) {
-      crypto.randomBytes(16, function(ex, buf) {
-          if (ex) throw ex;
-
-          var streamid = [];
-          for (var i = 0; i < buf.length; i++) {
-              var charCode = String.fromCharCode((buf[i] % 26) + 65);
-              streamid.push(charCode);
-          };
-          var writeToken = crypto.randomBytes(22).toString('hex');
-          var readToken = crypto.randomBytes(22).toString('hex');
-          var stream = {
-              streamid: streamid.join(''),
-              writeToken: writeToken,
-              readToken: readToken
-          };
-          var fileName = __dirname +'/fake_data/stream/'+stream.streamid;
-          fs.ensureFile(fileName, function(err) {
-            if(err){
-               console.log(err); //null
-            }else{
-                fs.writeFile(fileName, JSON.stringify(stream, null, 4), function(err) {
-                    if(err) {
-                        console.log(err);
-                    } else {
-                        console.log("JSON saved to " + fileName);
-                    }
-                });
-
-            }
-          });
-
-
-          res.send(stream)
-      });
+    var stream = {
+        streamid: randomValueHex(16),
+        writeToken: randomValueBase64(22),
+    };
+    var fileName = __dirname +'/fake_data/stream/'+stream.streamid;
+    fs.ensureFile(fileName, function(err) {
+        if(err){
+            console.log(err); //null
+        }else{
+            fs.writeFile(fileName, JSON.stringify(stream, null, 4), function(err) {
+                if(err) {
+                    console.log(err);
+                } else {
+                    console.log("JSON saved to " + fileName);
+                }
+            });
+        }
+    });
+    res.send(stream)
 });
-
+//TODO: not sure about the purpose ?
 app.get('/stream/:id', function (req, res) {
   var readToken = req.headers.authorization;
   var fileName = __dirname +'/fake_data/event/'+req.params.id;
@@ -162,6 +147,21 @@ var authenticateWriteToken = function (token, id, error, success) {
       }
     });
 };
+
+function randomValueHex (len) {
+    return crypto.randomBytes(Math.ceil(len/2))
+        .toString('hex') // convert to hexadecimal format
+        .slice(0,len);   // return required number of characters
+}
+
+function randomValueBase64 (len) {
+    return crypto.randomBytes(Math.ceil(len * 3 / 4))
+        .toString('base64')   // convert to base64 format
+        .slice(0, len)        // return required number of characters
+        .replace(/\+/g, '0')  // replace '+' with '0'
+        .replace(/\//g, '0'); // replace '/' with '0'
+}
+
 
 var port = 7000;
 app.listen(port, function () {
