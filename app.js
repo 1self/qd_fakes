@@ -100,6 +100,10 @@ app.get('/v1/streams/:id', function (req, res) {
 // /v1/streams/:id/events/ambientsound/sample/dba
 // /v1/streams/:id/events/ambientsound/sample/raw
 
+// /v1/users/edsykes/events/ambient;sound/sample     /dba /avg         /daily  /barchart
+// /v1/users/edsykes/events/:objectTags  /:actionTag/:prop/:aggregation/:rollup/barchart
+
+
 //app.get('/streams/:id/events/:objecttags/:actiontags/:value/:aggregation/:rollup/:visualization', function (req, res) {
   app.get('/streams/:id/events/:objecttags/:actiontags/:prop/:aggregation/:rollup/:visualization', function (req, res) {
   var readToken = req.headers.authorization;
