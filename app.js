@@ -24,10 +24,17 @@ app.use(express.static(__dirname + '/public'));
 
 exports.app = app;
 
-app.post('/stream', function (req, res) {
+app.post('/v1/streams', function (req, res) {
+    var appkey = req.headers.authorization;
+    if(appkey === undefined){
+      res.send(401);
+    }
+
     var stream = {
-        streamid: randomValueHex(16),
-        writeToken: randomValueBase64(22),
+        streamid: 1234567890,
+        writeToken: "writetoken",
+        readToken: "readtoken",
+        appkey: appkey
     };
     var fileName = __dirname +'/fake_data/stream/'+stream.streamid;
     fs.ensureFile(fileName, function(err) {
@@ -46,7 +53,7 @@ app.post('/stream', function (req, res) {
     res.send(stream)
 });
 //TODO: not sure about the purpose ?
-app.get('/stream/:id', function (req, res) {
+app.get('/v1/streams/:id', function (req, res) {
   var readToken = req.headers.authorization;
   var fileName = __dirname +'/fake_data/event/'+req.params.id;
 
@@ -68,8 +75,59 @@ app.get('/stream/:id', function (req, res) {
         }
   });
 });
+
+// some examples of what the events look like
+// /v1/streams/:id/events/ambient;sound/sample/dba/sum/daily/barchart
+
+// /v1/streams/:id/events/ambient;sound/sample/dba
+
+// /v1/streams/:id/events/self/meet/duration/sum/daily/barchart
+// /v1/streams/:id/events/self/exercise/duration/sum/daily/barchart
+// /v1/streams/:id/events/teeth/floss/duration/sum/daily/barchart
+// /v1/streams/:id/events/self/meditate/duration/sum/daily/barchart
+// /v1/streams/:id/events/self/commute/duration/sum/daily/barchart
+// /v1/streams/:id/events/self/sleep/duration/sum/daily/barchart
+// /v1/streams/:id/events/self/party/duration/sum/daily/barchart
+// /v1/streams/:id/events/self/code/duration/sum/daily/barchart
+// /v1/streams/:id/events/tv/watch/duration/sum/daily/barchart
+// /v1/streams/:id/events/self/write/duration/sum/daily/barchart
+// /v1/streams/:id/events/self/interview/duration/sum/daily/barchart
+// /v1/streams/:id/events/self/study/duration/sum/daily/barchart
+// /v1/streams/:id/events/homework/do/duration/sum/daily/barchart
+// /v1/streams/:id/events/dog/walk/duration/sum/daily/barchart
+// /v1/streams/:id/events/chores/do/duration/sum/daily/barchart
+// /v1/streams/:id/events/lifeadmin/do/duration/sum/daily/barchart
+// /v1/streams/:id/events/ambientsound/sample/dba
+// /v1/streams/:id/events/ambientsound/sample/raw
+
+//app.get('/streams/:id/events/:objecttags/:actiontags/:value/:aggregation/:rollup/:visualization', function (req, res) {
+  app.get('/streams/:id/events/:objecttags/:actiontags/:prop/:aggregation/:rollup/:visualization', function (req, res) {
+  var readToken = req.headers.authorization;
+  if(readToken=== undefined){
+    readToken = req.query.readtoken;
+  }
+  var fileName = __dirname +'/fake_data/event/'+req.params.id;
+
+  if(readToken != "readtoken"){
+    res.send(401);
+  }
+
+  var params = {
+    streamid: req.params.id,
+    objecttags: req.params.objecttags,
+    actiontags: req.params.actiontags,
+    prop: req.params.prop,
+    aggregation: req.params.aggregation,
+    rollup: req.params.rollup, 
+    visualization: req.params.visualization,
+  }
+  console.log(params);
+  var body = "<html><body>" + JSON.stringify(params) + "</body></html>"
+  res.send(body);
+});
+
 //TODO:clean it the way its done /batch
-app.post('/stream/:id/event', function (req, res) {
+app.post('/v1/streams/:id/events', function (req, res) {
     var writeToken = req.headers.authorization;
     authenticateWriteToken(
       writeToken,
@@ -85,7 +143,7 @@ app.post('/stream/:id/event', function (req, res) {
     );
  });
 
- app.post('/stream/:id/batch', function(req,res){
+ app.post('/v1/streams/:id/batch', function(req,res){
    var writeToken = req.headers.authorization;
    var streamid = req.params.id;
    var events = req.body;
