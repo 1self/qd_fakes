@@ -207,7 +207,7 @@ var parseEvent = function(event, stream){
                 source : event.source,
                 objectTags : event.objectTags,
             streamid : stream.streamid,
-            properties : {},
+            properties : event.properties,
             eventDateTime : moment(new Date()).format()
         }
     }
